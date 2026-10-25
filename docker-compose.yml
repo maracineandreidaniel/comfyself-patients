@@ -1,0 +1,6 @@
+services:
+  comfyself.patients.api:
+    image: ${DOCKER_REGISTRY-}comfyselfpatientsapi
+    build:
+      context: .
+      dockerfile: ComfySelf.Patients\Dockerfile

@@ -11,7 +11,7 @@ public class PatientService : IPatientService
 
     public PatientService(IPatientRepository patientRepository) => _patientRepository = patientRepository;
 
-    public async Task CreatePatient(CreatePatientDTO patient, CancellationToken cancellationToken)
+    public async Task CreatePatient(CreatePatientDto patient, CancellationToken cancellationToken)
     {
         var patientToBeAdded = new Patient
         {
@@ -23,18 +23,11 @@ public class PatientService : IPatientService
        await _patientRepository.CreatePatient(patientToBeAdded, cancellationToken);
     }
 
-    public async Task DeletePatient(Guid patientId, CancellationToken cancellationToken)
-    {
-        Patient? patient = await _patientRepository
-            .GetPatientById(patientId, cancellationToken) ?? throw new KeyNotFoundException(
-                $"Patient with id '{patientId}' was not found.");
-
-        await _patientRepository.DeletePatient(patientId, cancellationToken);
-    }
+    public async Task DeletePatient(Guid patientId, CancellationToken cancellationToken) => await _patientRepository.DeletePatient(patientId, cancellationToken);
 
     public async Task<bool> ExistsPatient(Guid patientId, CancellationToken cancellationToken) => await _patientRepository.ExistsPatient(patientId, cancellationToken);
 
-    public async Task<List<PatientDTO>> GetAllPatients(CancellationToken cancellationToken)
+    public async Task<List<PatientDto>> GetAllPatients(CancellationToken cancellationToken)
     {
         List<Patient> patients = await _patientRepository.GetAllPatients(cancellationToken);
 
@@ -43,7 +36,7 @@ public class PatientService : IPatientService
        .ToList();
     }
 
-    public async Task<PatientDTO> GetPatientById(Guid patientId, CancellationToken cancellationToken)
+    public async Task<PatientDto> GetPatientById(Guid patientId, CancellationToken cancellationToken)
     {
         Patient? patient = await _patientRepository
             .GetPatientById(patientId, cancellationToken) ?? throw new KeyNotFoundException(
@@ -52,19 +45,19 @@ public class PatientService : IPatientService
         return MapToDto(patient);
     }
 
-    public async Task UpdatePatient(UpdatePatientDTO patient, CancellationToken cancellationToken)
+    public async Task UpdatePatient(UpdatePatientDto patient, CancellationToken cancellationToken)
     {
         Patient updatedPatient = await _patientRepository.GetPatientById(patient.IdToUpdate, cancellationToken) ?? throw new KeyNotFoundException(
                 $"Patient with id '{patient.IdToUpdate}' was not found.");
 
-        patient.Description = patient.Description;
-        patient.Birthday = patient.Birthday;
-        patient.Name = patient.Name;
+        updatedPatient.Description = patient.Description;
+        updatedPatient.Birthday = patient.Birthday;
+        updatedPatient.Name = patient.Name;
 
-        await _patientRepository.UpdatePatient((Patient)updatedPatient, cancellationToken);
+        await _patientRepository.UpdatePatient(updatedPatient, cancellationToken);
     }
 
-    private PatientDTO MapToDto(Patient patient) => new PatientDTO
+    private PatientDto MapToDto(Patient patient) => new PatientDto
     {
         Id = patient.Id,
         Name = patient.Name,

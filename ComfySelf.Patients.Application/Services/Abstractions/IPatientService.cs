@@ -10,10 +10,10 @@ namespace ComfySelf.Patients.Application.Services.Abstractions;
 
 public interface IPatientService
 {
-    Task CreatePatient(CreatePatientDTO patient, CancellationToken cancellationToken);
-    Task UpdatePatient(UpdatePatientDTO patient, CancellationToken cancellationToken);
+    Task CreatePatient(CreatePatientDto patient, CancellationToken cancellationToken);
+    Task UpdatePatient(UpdatePatientDto patient, CancellationToken cancellationToken);
     Task DeletePatient(Guid patientId, CancellationToken cancellationToken);
-    Task<PatientDTO> GetPatientById(Guid patientId, CancellationToken cancellationToken);
+    Task<PatientDto> GetPatientById(Guid patientId, CancellationToken cancellationToken);
     Task<bool> ExistsPatient(Guid patientId, CancellationToken cancellationToken);
-    Task<List<PatientDTO>> GetAllPatients(CancellationToken cancellationToken);
+    Task<List<PatientDto>> GetAllPatients(CancellationToken cancellationToken);
 }

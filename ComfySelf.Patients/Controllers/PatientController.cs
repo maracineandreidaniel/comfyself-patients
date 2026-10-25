@@ -6,28 +6,28 @@ namespace ComfySelf.Patients.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-internal sealed class PatientController : ControllerBase
+public class PatientController : ControllerBase
 {
     private readonly IPatientService _patientService;
 
     public PatientController(IPatientService patientService) => _patientService = patientService;
 
     [HttpGet("GetAll")]
-    public async Task<ActionResult<List<PatientDTO>>> GetAll(
+    public async Task<ActionResult<List<PatientDto>>> GetAll(
    CancellationToken cancellationToken)
     {
-        List<PatientDTO> patients = await _patientService.GetAllPatients(
+        List<PatientDto> patients = await _patientService.GetAllPatients(
             cancellationToken);
 
         return Ok(patients);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<PatientDTO>> GetById(
+    public async Task<ActionResult<PatientDto>> GetById(
         Guid id,
         CancellationToken cancellationToken)
     {
-        PatientDTO? patient = await _patientService.GetPatientById(
+        PatientDto? patient = await _patientService.GetPatientById(
             id,
             cancellationToken);
 
@@ -40,7 +40,7 @@ internal sealed class PatientController : ControllerBase
     }
 
     [HttpGet("ExistsPatient/{id:guid}")]
-    public async Task<ActionResult<PatientDTO>> ExistsPatient(
+    public async Task<ActionResult<PatientDto>> ExistsPatient(
         Guid id,
         CancellationToken cancellationToken)
     {
@@ -52,8 +52,8 @@ internal sealed class PatientController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<PatientDTO>> Create(
-        CreatePatientDTO dto,
+    public async Task<ActionResult<PatientDto>> Create(
+        CreatePatientDto dto,
         CancellationToken cancellationToken)
     {
        await _patientService.CreatePatient(
@@ -65,7 +65,7 @@ internal sealed class PatientController : ControllerBase
 
     [HttpPut]
     public async Task<IActionResult> Update(
-        UpdatePatientDTO dto,
+        UpdatePatientDto dto,
         CancellationToken cancellationToken)
     {
       await  _patientService.UpdatePatient(

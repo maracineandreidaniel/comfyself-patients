@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ComfySelf.Patients.Application.Models.DTOs;
 
-public class PatientDTO
+public class PatientDto
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }

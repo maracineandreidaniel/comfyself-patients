@@ -1,6 +1,6 @@
 ﻿namespace ComfySelf.Patients.Application.Models.DTOs;
 
-public class CreatePatientDTO
+public class CreatePatientDto
 {
     public required string Name { get; set; }
     public string? Description { get; set; }
