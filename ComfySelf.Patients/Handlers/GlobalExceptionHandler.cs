@@ -1,35 +1,34 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ComfySelf.Patients.API.Handlers
+namespace ComfySelf.Patients.API.Handlers;
+
+internal sealed class GlobalExceptionHandler(
+    IProblemDetailsService problemDetailsService,
+    ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
-    public sealed class GlobalExceptionHandler(
-        IProblemDetailsService problemDetailsService,
-        ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext,
+        Exception exception, 
+        CancellationToken cancellationToken)
     {
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext,
-            Exception exception, 
-            CancellationToken cancellationToken)
+        logger.LogError(exception, "Unhandled exception ocurred.");
+
+        httpContext.Response.StatusCode = exception switch
         {
-            logger.LogError(exception, "Unhandled exception ocurred.");
+            ApplicationException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        };
 
-            httpContext.Response.StatusCode = exception switch
+        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        {
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails
             {
-                ApplicationException => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-            {
-                HttpContext = httpContext,
-                Exception = exception,
-                ProblemDetails = new ProblemDetails
-                {
-                    Type = exception.GetType().Name,
-                    Title = "An error occured",
-                    Detail = exception.Message
-                }
-            });
-        }
+                Type = exception.GetType().Name,
+                Title = "An error occured",
+                Detail = exception.Message
+            }
+        });
     }
 }

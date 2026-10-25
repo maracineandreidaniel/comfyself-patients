@@ -10,48 +10,36 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddProblemDetails(configure =>
-{
-    configure.CustomizeProblemDetails = context =>
-    {
-        context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
-    };
-});
+builder.Services.AddProblemDetails(configure => configure.CustomizeProblemDetails = context => context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier));
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Add services to the container.
 
-builder.Services.AddDbContext<PatientsDbContext>(options =>
-{
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("PatientsDatabase"));
-});
+builder.Services.AddDbContext<PatientsDbContext>(options => options.UseSqlServer(
+        builder.Configuration.GetConnectionString("PatientsDatabase")));
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
+        ValidateIssuerSigningKey = true,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
+        IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
                     builder.Configuration["AppSettings:Token"]!)),
 
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["AppSettings:Issuer"],
 
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["AppSettings:Audience"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["AppSettings:Audience"],
 
-            ValidateLifetime = true,
+        ValidateLifetime = true,
 
-            ClockSkew = TimeSpan.Zero
-        };
+        ClockSkew = TimeSpan.Zero
     });
 
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
@@ -92,7 +80,7 @@ builder.Services.AddSwaggerGen(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
